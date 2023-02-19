@@ -45,8 +45,8 @@ require_once('./execute/global.php');
           <!-- Collect the nav links, forms, and other content for toggling -->
           <div class="collapse navbar-collapse offset w-100" id="navbarSupportedContent">
             <div class="row w-100 mr-0">
-              <div class="col-lg-7 pr-0 w-100">
-                <ul class="nav navbar-nav justify-content-around ">
+              <div class="col-lg-7 pr-0 ">
+                <ul class="nav navbar-nav w-100 justify-content-around " style="width:70vw !important">
                   <li class="nav-item">
                     <a class="nav-link" href="index.php">Home</a>
                   </li>
@@ -72,6 +72,11 @@ require_once('./execute/global.php');
                     <a href="./tracking.php" class="nav-link " role="button" aria-haspopup="true"
                       aria-expanded="false">Delivery</a>
                     
+                  </li>
+                  
+                  <li class="nav-item submenu dropdown">
+                    <a href="./admin_category.php" class="nav-link " role="button" aria-haspopup="true"
+                      aria-expanded="false">Category</a>
                   </li>
                   
                 </ul>
