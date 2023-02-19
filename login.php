@@ -1,3 +1,32 @@
+<?php
+include_once('./execute/pdo.php');
+include_once('./execute/global.php');
+if(isset($_GET['logout'])) {
+  deleteData('token_customer','token_content',$_COOKIE['token_id']);
+  setcookie('token_id',$token,0,'/');
+  header('location: login.php');
+}
+else if(isset($_COOKIE['token_id'])) {
+  header('location: index.php');
+}
+if(isset($_POST['username']) && isset($_POST['password'])){
+  $data = getCustomData('SELECT * FROM customers WHERE ctm_username ="'.  $_POST['username'] .'" AND ctm_password = "'. $_POST['password'] .'"');
+  if($data){
+    $token = md5(json_encode($data[0]). rand(0,rand(10,rand(20,100))));
+    insertData('token_customer',$token,$data[0][1],date('Y-m-d') );
+    setcookie('token_id',$token,time() + 60*60*24,'/');
+    echo alert_bt('success','Success Login');
+    echo '<script>
+    setTimeout(() => {
+      location.href = "./index.php"
+  }, 1000);
+    </script>';
+  }
+  else {
+    echo alert_bt('danger','Success Fail');
+  }
+}
+?>
 <!DOCTYPE html>
 
 
@@ -24,13 +53,13 @@
 </head>
 <body class="d-flex justify-content-center align-items-center flex-column" style="height: 100vh;">
   <h1>Login Form</h1>
-  <form class="container d-flex flex-column align-items-center justify-content-center">
+  <form method="post" class="container d-flex flex-column align-items-center justify-content-center">
     <div class="mt-10 w-50">
-      <input type="text" name="first_name" placeholder="Username" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Username'"
+      <input type="text" name="username" placeholder="Username" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Username'"
       required class="single-input">
     </div>
     <div class="mt-10 w-50">
-      <input type="text" name="first_name" placeholder="Password" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Password'"
+      <input type="password" name="password" placeholder="Password" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Password'"
       required class="single-input">
     </div>
     <div class="mt-10 w-50">
@@ -44,6 +73,5 @@
       <a href="./signup.php" style="color:currentColor" class="text-center d-block">Don't have an account?</a>
     </div>
   </form>
-  
   
 </body>

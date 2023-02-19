@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="css/responsive.css" />
 </head>
 
+
   <!--================Header Menu Area =================-->
   <header class="header_area">
     <div class="main_menu">
@@ -78,13 +79,19 @@
                       <i class="ti-user" aria-hidden="true"></i>
                     </a>
                   </li>
+<?php
+if(isset($_COOKIE['token_id'])) {
 
-                  <li class="nav-item">
-                    <a href="./favorite.php" class="icons">
-                      <i class="ti-heart" aria-hidden="true"></i>
-                    </a>
-                  </li>
-                </ul>
+  echo'
+  <li class="nav-item">
+  <a class="icons">
+  <i class="ti-arrow-right" aria-hidden="true" onclick="logout()"></i>
+  </a>
+  </li>';
+}
+?>
+
+</ul>
               </div>
             </div>
           </div>
@@ -92,4 +99,20 @@
       </div>
     </div>
   </header>
-
+<script>
+  function logout() {
+    if(confirm('Do you really want to logout?')) {
+      location.href = 'login.php?logout=1'
+    }
+  }
+</script>
+<?php
+include_once('./execute/pdo.php');
+include_once('./execute/global.php');
+if(isset($_COOKIE['token_id'])) {
+  if(!getCustomData('SELECT * FROM token_customer WHERE token_content = "'. $_COOKIE['token_id'] .'"')){
+    alert_bt('danger','Something went wrong ! Please try again');
+    die();
+  }
+}
+?>

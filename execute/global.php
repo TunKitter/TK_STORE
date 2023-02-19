@@ -9,12 +9,10 @@ function header_page() {
 }
 function alert_bt($type,$text,$has_link = 0 , $text_link = '',$link = '#') {
     if($has_link ==0) {
-
         echo '<div id="al_sc" class="alert alert-'. $type .'">'. $text .'</div>';
     }
     else {
         echo '<div id="al_sc" class="alert alert-'. $type .'">'. $text .' <a href="'. $link .'" class="alert-link">'. $text_link .'</a></div>';
-
     }
 }
 function enc_date() {
