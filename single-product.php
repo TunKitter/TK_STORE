@@ -1,5 +1,13 @@
 <?php
 include_once('./header.php');
+$data = '';
+if(isset($_GET['id_product'])) {
+$data = getCustomData('SELECT * FROM products WHERE prod_id  = "'. $_GET['id_product'] .'"')[0];
+}
+else {
+  $data = array('','','','','','','','');
+
+}
 ?>
     <!--================Home Banner Area =================-->
     <section class="banner_area">
@@ -91,23 +99,20 @@ include_once('./header.php');
           </div>
           <div class="col-lg-5 offset-lg-1">
             <div class="s_product_text">
-              <h3>Faded SkyBlu Denim Jeans</h3>
-              <h2>$149.99</h2>
+              <h3><?= $data[1] ?></h3>
+              <h2>$<?= $data[4] ?></h2>
               <ul class="list">
                 <li>
                   <a class="active" href="#">
-                    <span>Category</span> : Household</a
+                    <span>Category</span> : <?= getCustomData('SELECT cate_name FROM category_product WHERE cate_id = "'.$data[2] .'"')[0][0]  ?></a
                   >
                 </li>
                 <li>
-                  <a href="#"> <span>Availibility</span> : In Stock</a>
+                  <a href="#"> <span>Quantity</span> : <?= $data[7] ?></a>
                 </li>
               </ul>
               <p>
-                Mill Oil is an innovative oil filled radiator with the most
-                modern technology. If you are looking for something that can
-                make your interior look awesome, and at the same time give you
-                the pleasant warm feeling during the winter.
+             <?= $data[7]?>
               </p>
               <div class="product_count">
                 <label for="qty">Quantity:</label>
