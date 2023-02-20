@@ -17,8 +17,11 @@ if(isset($_POST['edit_id'])) {
     }
     $infor = json_encode(array('width'=> $_POST['width'],'height'=> $_POST['height'],'material'=> $_POST['material'],'national'=> $_POST['national'],'gender'=> $_POST['gender']));
     editData('products','prod_info', base64_encode($infor),'prod_id',$_POST['edit_id']);
-    if(isset($_FILES['image'])) {
-        move_uploaded_file($_FILES['image']['tmp_name'],'./img/product/'. $_POST['edit_id'] . '.'. explode('/',$_FILES['image']['type'])[1] );
+    // var_dump(($_FILES['image']['name'][0]) == '');
+    if($_FILES['image']['name'][0] != '') {
+        for($j = 0 ; $j < count($_FILES['image']['name']) ; $j++) {
+            move_uploaded_file($_FILES['image']['tmp_name'][$j],'./img/product/__'. $j . $_POST['edit_id'] . '.'. explode('/',$_FILES['image']['type'][$j])[1] );
+        }
     }   
     header('location: ./admin_product.php');
     die();
@@ -27,10 +30,13 @@ if(isset($_POST['edit_id'])) {
 if(!empty($_POST['name']) && !empty($_POST['category'])&& !empty($_FILES['image'])&&!empty($_POST['price'])&&!empty($_POST['description'])&&!empty($_POST['quantity'])&&!empty($_POST['brand'])  && !empty($_POST['width'])&&!empty($_POST['height'])&&!empty($_POST['gender']) && !empty($_POST['material']) && !empty($_POST['national'])) {
         if(!(isset($_SESSION['success_insert']))) {
         $infor = json_encode(array('width'=> $_POST['width'],'height'=> $_POST['height'],'gender'=>$_POST['gender'],'material'=> $_POST['material'],'national'=> $_POST['national']));
-        // var_dump($_POST);
         $id = enc_product($_POST['color'],$_POST['brand']);
-        insertData('products',$id ,$_POST['name'],$_POST['category'],$id .'.' . explode('/',$_FILES['image']['type'])[1],$_POST['price'],0,$_POST['description'],$_POST['quantity'],base64_encode($infor));
-        move_uploaded_file($_FILES['image']['tmp_name'],'./img/product/'. $id . '.'. explode('/',$_FILES['image']['type'])[1]);
+        $image_extend = array();
+        for ($i=0; $i < count($_FILES['image']['name']); $i++) { 
+            move_uploaded_file($_FILES['image']['tmp_name'][$i],'./img/product/'.'__'. $i  . $id . '.'. explode('/',$_FILES['image']['type'][$i])[1]);
+            $image_extend[$i]  = explode('/',$_FILES['image']['type'][$i])[1];
+        }
+        insertData('products',$id ,$_POST['name'],$_POST['category'], base64_encode(json_encode($image_extend)),$_POST['price'],0,$_POST['description'],$_POST['quantity'],base64_encode($infor));
         $_SESSION['success_insert'] = $id;
         die();
     }
@@ -66,7 +72,7 @@ if(!empty($_POST['name']) && !empty($_POST['category'])&& !empty($_FILES['image'
                                 </div>
                                 <div>
                                     <label>Image</label>
-                                    <input type='file' name='image' class="d-block" />
+                                    <input type='file' name='image[]' multiple class="d-block" />
                                 </div>
                                 <div>
                                     <label>Price</label>

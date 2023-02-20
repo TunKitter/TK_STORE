@@ -20,7 +20,12 @@ else if(isset($_SESSION['success_edit'])) {
 if(isset($_GET['del']))
  {
 		for ($i=0; $i < count(explode(';',$_GET['del'])); $i++) { 
+			$del_data = json_decode(base64_decode(getCustomData('SELECT prod_image FROM products WHERE prod_id = "'. explode(';',$_GET['del'])[$i] .'"')[0][0]));
+			for($j = 0 ; $j < count(($del_data));$j++) {
+				unlink('./img/product/__'. $j . explode(';',$_GET['del'])[$i] . '.' .$del_data[$j]);
+			}
 			deleteData('products','prod_id',explode(';',$_GET['del'])[$i]);
+
 		}
 		$_SESSION['success_del'] = '1';
 		header_page();
@@ -58,9 +63,9 @@ if(isset($_GET['del']))
 		echo '	<div class="table-row text-success">
 				<div class="serial d-flex flex-row-reverse justify-content-end align-items-center "><label for="chk"  >New</label><input class="d-none" type="checkbox" id="chk"  class="form-check" /></div>
 				<div class="serial name text-truncate flex-fill">'. $new_product[0][0] .'</div>
-				<div class="serial username">'. $new_product[0][1] .'</div>
+				<div class="serial text-capitalize username">'. $new_product[0][1] .'</div>
 				<div class="serial password">'. $new_product[0][2] .'</div>
-				<div class="serial email "><img src="./img/product/'. $new_product[0][3].'" style="max-width: 100px" /></div>
+				<div class="serial email "><img src="./img/product/__0'. $new_product[0][0].'.'. json_decode(base64_decode($new_product[0][3]))[0] .'" style="max-width: 100px" /></div>
 				<div class="serial phone">'. $new_product[0][4] .'</div>
 				<div class="serial"><a href="#"><span class="lnr lnr-arrow-right float-right" data-toggle="modal" data-target="#edit"></span></a></div>
 			</div>';
@@ -75,9 +80,9 @@ if(isset($_GET['del']))
 				echo '<div class="table-row">
 				<div class="serial d-flex flex-row-reverse justify-content-end align-items-center "><label for="chk_'. $i .'"  >'. $i .'</label><input class="d-none" type="checkbox" id="chk_'. $i .'"  class="form-check" /></div>
 				<div class="serial name text-truncate flex-fill">'.$data[$i][0].'</div>
-				<div class="serial username">'. $data[$i][1].'</div>
+				<div class="serial text-capitalize username">'. $data[$i][1].'</div>
 				<div class="serial password">'. $data[$i][2].'</div>
-				<div class="serial email "><img src="./img/product/'. $data[$i][3].'" style="max-width: 100px" /></div>
+				<div class="serial email "><img src="./img/product/__0'. $data[$i][0].'.'. json_decode(base64_decode($data[$i][3]))[0] .'" style="max-width: 100px" /></div>
 				<div class="serial phone">'. $data[$i][4] .'</div>	
 				<div class="serial"><a href="#"><span class="lnr lnr-arrow-right float-right" data-toggle="modal" data-target="#edit" onclick="edit_customer('. $i .')"></span></a></div>
 			</div>';

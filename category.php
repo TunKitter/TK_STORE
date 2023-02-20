@@ -55,8 +55,7 @@ include_once('./execute/pdo.php');
                     <div class="product-img">
                       <img
                         class="card-img"
-                        src="./img/product/'. $data[$i][3] .'"
-                        alt=""
+                        src="./img/product/__0'. $data[$i][0] . '.'. json_decode(base64_decode($data[$i][3]))[0]. '"
                       />
                       <div class="p_icon">
                         <a href="./single-product.php?id_product='. $data[$i][0] .'">

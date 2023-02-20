@@ -48,58 +48,50 @@ else {
                     class="active"
                   >
                     <img
-                      src="img/product/single-product/s-product-s-2.jpg"
-                      alt=""
+                      src="img/product/__0<?= $data[0]  .'.'. json_decode(base64_decode($data[3]))[0] ?>" 
+                      width="50px"
                     />
                   </li>
-                  <li
-                    data-target="#carouselExampleIndicators"
-                    data-slide-to="1"
-                  >
-                    <img
-                      src="img/product/single-product/s-product-s-3.jpg"
-                      alt=""
-                    />
-                  </li>
-                  <li
-                    data-target="#carouselExampleIndicators"
-                    data-slide-to="2"
-                  >
-                    <img
-                      src="img/product/single-product/s-product-s-4.jpg"
-                      alt=""
-                    />
-                  </li>
+                <?php
+                for ($i=1; $i < count(json_decode(base64_decode($data[3]))) ; $i++) { 
+                  echo '  <li
+                  data-target="#carouselExampleIndicators"
+                  data-slide-to="'. $i .'"
+                >
+                  <img
+                    src="img/product/__'. $i. $data[0]. '.'. json_decode(base64_decode($data[3]))[0] .'"
+                    width="50px"
+                  />
+                </li>';
+                }
+                ?>
                 </ol>
                 <div class="carousel-inner">
                   <div class="carousel-item active">
                     <img
                       class="d-block w-100"
-                      src="img/product/single-product/s-product-1.jpg"
+                      src="img/product/__0<?= $data[0] .'.'. json_decode(base64_decode($data[3]))[0] ?>"  
                       alt="First slide"
                     />
                   </div>
-                  <div class="carousel-item">
+                  <?php
+                  for ($i=1; $i < count(json_decode(base64_decode($data[3]))); $i++) { 
+                    echo '<div class="carousel-item">
                     <img
                       class="d-block w-100"
-                      src="img/product/single-product/s-product-1.jpg"
+                      src="img/product/__'.$i . $data[0].'.'. json_decode(base64_decode($data[3]))[0] .'"
                       alt="Second slide"
                     />
-                  </div>
-                  <div class="carousel-item">
-                    <img
-                      class="d-block w-100"
-                      src="img/product/single-product/s-product-1.jpg"
-                      alt="Third slide"
-                    />
-                  </div>
+                  </div>';
+                  }
+                  ?>
                 </div>
               </div>
             </div>
           </div>
           <div class="col-lg-5 offset-lg-1">
             <div class="s_product_text">
-              <h3><?= $data[1] ?></h3>
+              <h4 class="text-uppercase"><?= $data[1] ?></h4>
               <h2>$<?= $data[4] ?></h2>
               <ul class="list">
                 <li>
@@ -112,7 +104,7 @@ else {
                 </li>
               </ul>
               <p>
-             <?= $data[7]?>
+             <?= $data[6]?>
               </p>
               <div class="product_count">
                 <label for="qty">Quantity:</label>
