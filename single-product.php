@@ -1,8 +1,14 @@
 <?php
 include_once('./header.php');
+session_start();
 $data = '';
+// $_SESSION = array();
 if(isset($_GET['id_product'])) {
 $data = getCustomData('SELECT * FROM products WHERE prod_id  = "'. $_GET['id_product'] .'"')[0];
+if(!isset($_SESSION[$_GET['id_product']])) {
+  editData('products','prod_click',($data[5]+1),'prod_id',$_GET['id_product']);  
+  $_SESSION[$_GET['id_product']] = '1';
+}
 }
 else {
   $data = array('','','','','','','','');
