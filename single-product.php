@@ -1,6 +1,21 @@
 <?php
-include_once('./header.php');
+ob_start();
 session_start();
+include_once('./header.php');
+if(isset($_GET['del_cmt']) && isset($_GET['id_product'])) {
+    deleteData('comment','cmt_id',$_GET['del_cmt']);
+    alert_bt('success','Delete Successfully');
+    echo '<script>
+    setTimeout(() => {
+      location.href = "./single-product.php?id_product='. $_GET['id_product'] .'"
+    }, 1000);
+    </script>';
+}
+if(isset($_POST['content'])&& !empty($_POST['content']) && isset($_POST['star'])) {
+
+  insertData('comment',substr(md5(($_POST['content'])),0,rand(0,strlen($_POST['content']))),getCustomData('SELECT token_username FROM token_customer WHERE token_content = "'. $_COOKIE['token_id'] .'" ')[0][0],$_GET['id_product'],$_POST['content'],$_POST['star']);
+  header('location: ./single-product.php?id_product='. $_GET['id_product']);
+}
 $data = '';
 // $_SESSION = array();
 if(isset($_GET['id_product'])) {
@@ -112,7 +127,9 @@ else {
               <p>
              <?= $data[6]?>
               </p>
-              <div class="product_count">
+             <?php
+              if(isset($_COOKIE['token_id'])) {
+                echo '<div class="product_count">
                 <label for="qty">Quantity:</label>
                 <input
                   type="text"
@@ -124,28 +141,38 @@ else {
                   class="input-text qty"
                 />
                 <button
-                  onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;"
+                  onclick="var result = document.getElementById(\'sst\'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;"
                   class="increase items-count"
                   type="button"
                 >
                   <i class="lnr lnr-chevron-up"></i>
                 </button>
                 <button
-                  onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;"
+                  onclick="var result = document.getElementById(\'sst\'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;"
                   class="reduced items-count"
-                  type="button"
-                >
+                  type="button">
                   <i class="lnr lnr-chevron-down"></i>
                 </button>
-              </div>
+              </div>';
+              
+              }
+              else {
+                echo '<p style="font-size: 1.4em">Want to buy ? <a href="./login.php?id_product='. $_GET['id_product'].'" style="text-decoration:underline; color:#71cd14">Login now</a></p>';
+              }
+             ?>
               <div class="card_area">
-                <a class="main_btn" href="#">Add to Cart</a>
-                <a class="icon_btn" href="#">
-                  <i class="lnr lnr lnr-diamond"></i>
-                </a>
-                <a class="icon_btn" href="#">
-                  <i class="lnr lnr lnr-heart"></i>
-                </a>
+                <?php
+                if(isset($_COOKIE['token_id'])) {
+                  echo ' <a class="main_btn" href="#">Add to Cart</a>
+                  <a class="icon_btn" href="#">
+                    <i class="lnr lnr lnr-diamond"></i>
+                  </a>
+                  <a class="icon_btn" href="#">
+                    <i class="lnr lnr lnr-heart"></i>
+                  </a>';
+                }
+                ?>
+                 
               </div>
             </div>
           </div>
@@ -159,17 +186,7 @@ else {
       <div class="container">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item">
-            <a
-              class="nav-link"
-              id="home-tab"
-              data-toggle="tab"
-              href="#home"
-              role="tab"
-              aria-controls="home"
-              aria-selected="true"
-              >Description</a
-            >
-          </li>
+            
           <li class="nav-item">
             <a
               class="nav-link"
@@ -179,11 +196,11 @@ else {
               role="tab"
               aria-controls="profile"
               aria-selected="false"
-              >Specification</a
+              >Product Detail</a
             >
           </li>
           <li class="nav-item">
-            <a
+            <a 
               class="nav-link"
               id="contact-tab"
               data-toggle="tab"
@@ -191,7 +208,7 @@ else {
               role="tab"
               aria-controls="contact"
               aria-selected="false"
-              >Comments</a
+              >You might interest in</a
             >
           </li>
           <li class="nav-item">
@@ -203,7 +220,7 @@ else {
               role="tab"
               aria-controls="review"
               aria-selected="false"
-              >Reviews</a
+              >Comment</a
             >
           </li>
         </ul>
@@ -253,70 +270,20 @@ else {
             <div class="table-responsive">
               <table class="table">
                 <tbody>
-                  <tr>
-                    <td>
-                      <h5>Width</h5>
-                    </td>
-                    <td>
-                      <h5>128mm</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>Height</h5>
-                    </td>
-                    <td>
-                      <h5>508mm</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>Depth</h5>
-                    </td>
-                    <td>
-                      <h5>85mm</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>Weight</h5>
-                    </td>
-                    <td>
-                      <h5>52gm</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>Quality checking</h5>
-                    </td>
-                    <td>
-                      <h5>yes</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>Freshness Duration</h5>
-                    </td>
-                    <td>
-                      <h5>03days</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>When packeting</h5>
-                    </td>
-                    <td>
-                      <h5>Without touch of hand</h5>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <h5>Each Box contains</h5>
-                    </td>
-                    <td>
-                      <h5>60pcs</h5>
-                    </td>
-                  </tr>
+                    <?php
+                    $inf_infor = (array) (json_decode(base64_decode($data[8])) );
+                    foreach ($inf_infor as $key => $value) {
+                      echo '<tr>
+                      <td>
+                        <h5 class="text-capitalize">'. $key .'</h5>
+                      </td>
+                      <td>
+                        <h5 class="text-capitalize">'. $value .'</h5>
+                      </td>
+                    </tr>';
+                    }
+                    // var_dump(dec_product($data[0]));
+                    ?>
                 </tbody>
               </table>
             </div>
@@ -475,13 +442,13 @@ else {
                   <div class="col-6">
                     <div class="box_total">
                       <h5>Overall</h5>
-                      <h4>4.0</h4>
-                      <h6>(03 Reviews)</h6>
+                      <h4 id="average_rate">4.0</h4>
+                      <h6>(<?= getCustomData('SELECT COUNT(cmt_id) FROM comment WHERE cmt_product = "'. $_GET['id_product'] .'"')[0][0] ?> Reviews)</h6>
                     </div>
                   </div>
                   <div class="col-6">
                     <div class="rating_list">
-                      <h3>Based on 3 Reviews</h3>
+                      <h3>Total Reviews Rate</h3>
                       <ul class="list">
                         <li>
                           <a href="#"
@@ -490,7 +457,7 @@ else {
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i> 01</a
+                            <i class="fa fa-star"></i> <span class="rate"><?=getCustomData('SELECT COUNT(cmt_id) FROM comment WHERE cmt_product = "'. $_GET['id_product'] .'" AND cmt_rate = 5')[0][0] ?></span></a
                           >
                         </li>
                         <li>
@@ -500,7 +467,7 @@ else {
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i> 01</a
+                            <i class="fa fa-star"></i> <span class="rate"><?=getCustomData('SELECT COUNT(cmt_id) FROM comment WHERE cmt_product = "'. $_GET['id_product'] .'" AND cmt_rate = 4')[0][0] ?></span></a
                           >
                         </li>
                         <li>
@@ -510,7 +477,7 @@ else {
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i> 01</a
+                            <i class="fa fa-star"></i> <span class="rate"><?=getCustomData('SELECT COUNT(cmt_id) FROM comment WHERE cmt_product = "'. $_GET['id_product'] .'" AND cmt_rate = 3')[0][0] ?></span></a
                           >
                         </li>
                         <li>
@@ -520,7 +487,7 @@ else {
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i> 01</a
+                            <i class="fa fa-star"></i> <span class="rate"><?=getCustomData('SELECT COUNT(cmt_id) FROM comment WHERE cmt_product = "'. $_GET['id_product'] .'" AND cmt_rate = 2')[0][0] ?></span></a
                           >
                         </li>
                         <li>
@@ -530,7 +497,7 @@ else {
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i> 01</a
+                            <i class="fa fa-star"></i> <span class="rate"><?=getCustomData('SELECT COUNT(cmt_id) FROM comment WHERE cmt_product = "'. $_GET['id_product'] .'" AND cmt_rate = 1')[0][0] ?></span></a
                           >
                         </li>
                       </ul>
@@ -538,159 +505,90 @@ else {
                   </div>
                 </div>
                 <div class="review_list">
-                  <div class="review_item">
-                    <div class="media">
-                      <div class="d-flex">
-                        <img
-                          src="img/product/single-product/review-1.png"
-                          alt=""
-                        />
-                      </div>
-                      <div class="media-body">
-                        <h4>Blake Ruiz</h4>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                      </div>
+                <?php
+                $comment_data = getCustomData('SELECT * FROM comment WHERE cmt_product = "'. $_GET['id_product'] .'"');
+                if(!$comment_data) {
+                  echo '<p>Nothing to show</p>';
+                }
+                else {
+
+                
+                for ($i=0; $i < count($comment_data); $i++) { 
+                  $star_cmt = '';
+                  $name_id = array(array('',''));
+                  if(isset($_COOKIE['token_id'] )) {
+                  $username_token = getCustomData('SELECT token_username FROM token_customer WHERE token_content = "'. $_COOKIE['token_id'] .'"')[0][0];
+                    $name_id = getCustomData('SELECT ctm_username,ctm_name FROM customers WHERE ctm_username = "'.  $username_token .'"');
+                  }
+                  for ($j=0; $j < $comment_data[$i][4] ; $j++) { 
+$star_cmt.='<i class="fa fa-star"></i>';
+                  }
+                  echo '  <div class="review_item">
+                  <div class="media">
+                    <div class="d-flex">
+                      <p class="text-white rounded-circle bg-secondary p-3" style="font-weight:bold">'. $comment_data[$i][1]  .'</p>  
                     </div>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                      ullamco laboris nisi ut aliquip ex ea commodo
-                    </p>
-                  </div>
-                  <div class="review_item">
-                    <div class="media">
-                      <div class="d-flex">
-                        <img
-                          src="img/product/single-product/review-2.png"
-                          alt=""
-                        />
-                      </div>
-                      <div class="media-body">
-                        <h4>Blake Ruiz</h4>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                      </div>
+                    <div class="media-body">
+                      <h4>'.  $name_id[0][1] . ($name_id[0][0] == $comment_data[$i][1] ? '<button class="btn" onclick="delete_cmt(`'. $comment_data[$i][0] .'`)" style="transform:scale(0.7)">X</button>' : '')   .' </h4>
+                      '.  $star_cmt .'
                     </div>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                      ullamco laboris nisi ut aliquip ex ea commodo
-                    </p>
                   </div>
-                  <div class="review_item">
-                    <div class="media">
-                      <div class="d-flex">
-                        <img
-                          src="img/product/single-product/review-3.png"
-                          alt=""
-                        />
-                      </div>
-                      <div class="media-body">
-                        <h4>Blake Ruiz</h4>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                      </div>
-                    </div>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                      ullamco laboris nisi ut aliquip ex ea commodo
-                    </p>
-                  </div>
+                  <p> ' .  $comment_data[$i][3] .'
+                  </p>
+                </div>
+               ';
+                }
+              }
+                ?>
                 </div>
               </div>
               <div class="col-lg-6">
-                <div class="review_box">
-                  <h4>Add a Review</h4>
+                <?php
+                if(isset($_COOKIE['token_id'])) {
+                  echo '<div class="review_box">
+                  <h4 id="demos">Add a Review</h4>
                   <p>Your Rating:</p>
                   <ul class="list">
                     <li>
-                      <a href="#">
-                        <i class="fa fa-star"></i>
+                      <a onclick="star(1)" >
+                        <i class="fa fa-star star-rate" style="color:gray"></i>
                       </a>
                     </li>
                     <li>
-                      <a href="#">
-                        <i class="fa fa-star"></i>
+                      <a onclick="star(2)" >
+                        <i class="fa fa-star star-rate" style="color:gray"></i>
                       </a>
                     </li>
                     <li>
-                      <a href="#">
-                        <i class="fa fa-star"></i>
+                      <a onclick="star(3)" >
+                        <i class="fa fa-star star-rate" style="color:gray"></i>
                       </a>
                     </li>
                     <li>
-                      <a href="#">
-                        <i class="fa fa-star"></i>
+                      <a onclick="star(4)" >
+                        <i class="fa fa-star star-rate" style="color:gray"></i>
                       </a>
                     </li>
                     <li>
-                      <a href="#">
-                        <i class="fa fa-star"></i>
+                      <a onclick="star(5)" >
+                        <i class="fa fa-star star-rate" style="color:gray"></i>
                       </a>
                     </li>
                   </ul>
-                  <p>Outstanding</p>
                   <form
                     class="row contact_form"
-                    action="contact_process.php"
                     method="post"
                     id="contactForm"
                     novalidate="novalidate"
-                  >
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="name"
-                          name="name"
-                          placeholder="Your Full name"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <input
-                          type="email"
-                          class="form-control"
-                          id="email"
-                          name="email"
-                          placeholder="Email Address"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="number"
-                          name="number"
-                          placeholder="Phone Number"
-                        />
-                      </div>
-                    </div>
+                  > 
+                  <input type="hidden" name="star" value="1" />
                     <div class="col-md-12">
                       <div class="form-group">
                         <textarea
                           class="form-control"
-                          name="message"
+                          name="content"
                           id="message"
-                          rows="1"
+                          rows="7"
                           placeholder="Review"
                         ></textarea>
                       </div>
@@ -701,17 +599,54 @@ else {
                         value="submit"
                         class="btn submit_btn"
                       >
-                        Submit Now
+                        Comment
                       </button>
                     </div>
                   </form>
-                </div>
+                </div>';
+                }
+                else {
+                  echo '<p class="text-center">Login if you desire to comment</p><button onclick="location.href = `./login.php?id_product='. $_GET['id_product'] .'`" class="d-block mx-auto btn btn-default">Login now</button>';
+                }
+                ?>
               </div>
             </div>
           </div>
         </div>
       </div>
     </section>
+    <script>
+ let rate_star_average = (document.getElementsByClassName('rate'))
+ let average_rate_total = 0
+ lv_rate = 5;
+ count = 0
+ for (let i = 0; i < rate_star_average.length; i++) {
+    if(parseInt(rate_star_average[i].innerText) != 0)
+    {
+      average_rate_total+= parseInt(rate_star_average[i].innerText) * lv_rate
+      count+= parseInt(rate_star_average[i].innerText)
+    }
+    lv_rate--
+ }
+  document.getElementById('average_rate').innerText = parseFloat(  average_rate_total / count).toFixed(2)
+//  document.getElementById('average_rate').innerText =   average_rate_total
+      function star(index) {
+        document.getElementsByName('star')[0].value = index
+        for (let i = 0; i < 5; i++) {
+          document.getElementsByClassName('star-rate')[i].style.color = 'gray'
+        }
+        for(let i = 0 ; i < index ; i++) {
+          document.getElementsByClassName('star-rate')[i].style.color = '#fbd600'
+        }
+      }
+
+ function delete_cmt(text) {
+  if(confirm('Bạn chắc chắn muốn xoá?')) {
+    location.href = 'single-product.php?id_product=<?= $_GET['id_product'] ?>&del_cmt='+text
+  }
+ }   
+    </script>
 <?php
+ob_flush();
 include_once('footer.php');
 ?>

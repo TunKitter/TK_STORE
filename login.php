@@ -16,11 +16,21 @@ if(isset($_POST['username']) && isset($_POST['password'])){
     insertData('token_customer',$token,$data[0][1],date('Y-m-d') );
     setcookie('token_id',$token,time() + 60*60*24,'/');
     echo alert_bt('success','Success Login');
-    echo '<script>
-    setTimeout(() => {
-      location.href = "./index.php"
-  }, 1000);
-    </script>';
+    if(isset($_GET['id_product'])) {
+      echo '<script>
+      setTimeout(() => {
+        location.href = "./single-product.php?id_product='. $_GET['id_product'] .'"
+      }, 1000);
+      </script>';
+    }
+    else {
+
+      echo '<script>
+      setTimeout(() => {
+        location.href = "./index.php"
+      }, 1000);
+      </script>';
+    }
   }
   else {
     echo alert_bt('danger','Success Fail');

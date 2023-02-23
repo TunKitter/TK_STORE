@@ -109,10 +109,17 @@ if(isset($_COOKIE['token_id'])) {
 <?php
 include_once('./execute/pdo.php');
 include_once('./execute/global.php');
+
 if(isset($_COOKIE['token_id'])) {
   if(!getCustomData('SELECT * FROM token_customer WHERE token_content = "'. $_COOKIE['token_id'] .'"')){
     alert_bt('danger','Something went wrong ! Please try again');
     die();
+  }
+  else {
+    $token_time = getCustomData('SELECT token_time FROM token_customer WHERE token_content = "'. $_COOKIE['token_id'] .'"');
+    if((int)date('Ymd') - str_replace('-','',$token_time[0][0]) ){
+    deleteData('token_customer','token_time',$token_time[0][0])   ;
+    }
   }
 }
 ?>
