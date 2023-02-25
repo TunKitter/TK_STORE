@@ -10,31 +10,20 @@ else if(isset($_COOKIE['token_id'])) {
   header('location: index.php');
 }
 if(isset($_POST['username']) && isset($_POST['password'])){
-  $data = getCustomData('SELECT * FROM customers WHERE ctm_username ="'.  $_POST['username'] .'" AND ctm_password = "'. $_POST['password'] .'"');
-  if($data){
-    $token = md5(json_encode($data[0]). rand(0,rand(10,rand(20,100))));
-    insertData('token_customer',$token,$data[0][1],date('Y-m-d') );
-    setcookie('token_id',$token,time() + 60*60*24,'/');
-    echo alert_bt('success','Success Login');
-    if(isset($_GET['id_product'])) {
-      echo '<script>
-      setTimeout(() => {
-        location.href = "./single-product.php?id_product='. $_GET['id_product'] .'"
-      }, 1000);
-      </script>';
+    if($_POST) {
+
+        insertData('customers',$_POST['name'],$_POST['username'],$_POST['password'],$_POST['email'],$_POST['phone'],0);
+        alert_bt('success','Created Successfully ');
+        echo '<script>
+        setTimeout(() => {
+            location.href= "./login.php";
+        }, 1000);
+        </script>';
     }
     else {
+        alert_bt('danger','Created Failed! Please Try again');
 
-      echo '<script>
-      setTimeout(() => {
-        location.href = "./index.php"
-      }, 1000);
-      </script>';
     }
-  }
-  else {
-    echo alert_bt('danger','Success Fail');
-  }
 }
 ?>
 <!DOCTYPE html>
@@ -62,8 +51,12 @@ if(isset($_POST['username']) && isset($_POST['password'])){
   <link rel="stylesheet" href="css/responsive.css" />
 </head>
 <body class="d-flex justify-content-center align-items-center flex-column" style="height: 100vh;">
-  <h1>Login Form</h1>
+  <h1>Signup Form</h1>
   <form method="post" class="container d-flex flex-column align-items-center justify-content-center">
+    <div class="mt-10 w-50">
+      <input type="text" name="name" placeholder="Name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Name'"
+      required class="single-input">
+    </div>
     <div class="mt-10 w-50">
       <input type="text" name="username" placeholder="Username" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Username'"
       required class="single-input">
@@ -73,15 +66,19 @@ if(isset($_POST['username']) && isset($_POST['password'])){
       required class="single-input">
     </div>
     <div class="mt-10 w-50">
-      <a href="./forget.php?task=email" style="color:currentColor">Forgot Password?</a>
+      <input type="email" name="email" placeholder="Email" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Email'"
+      required class="single-input">
+    </div>
+    <div class="mt-10 w-50">
+      <input type="text" name="phone" placeholder="Phone number" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Phone number'"
+      required class="single-input">
     </div>
     <div class="mt-10 w-50">
       <button class="btn text-white btn-block " style="background-color: #71cd14">Login</button>
     </div>
     <div class="mt-10 w-50">
       
-      <a href="./signup.php" style="color:currentColor" class="text-center d-block">Don't have an account?</a>
+      <a href="./login.php" style="color:currentColor" class="text-center d-block">Already an Account?</a>
     </div>
   </form>
-  
 </body>

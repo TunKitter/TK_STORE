@@ -74,7 +74,7 @@ include_once('./execute/pdo.php');
                         <a href="./single-product.php?id_product='. $data[$i][0] .'">
                           <i class="ti-eye"></i>
                         </a>
-                        <a href="#">
+                        <a href="./single-product.php?id_product='. $data[$i][0] .'&cart=1&cate=1">
                           <i class="ti-shopping-cart"></i>
                         </a>
                       </div>

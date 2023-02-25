@@ -2,6 +2,35 @@
 ob_start();
 session_start();
 include_once('./header.php');
+
+if(isset($_GET['cart'])) { 
+  if(isset($_COOKIE['cart']))
+  {
+    $arr = (array) json_decode($_COOKIE['cart']);
+  $arr[count($arr)] = $_GET['id_product'];
+  setcookie('cart',json_encode($arr),time() + 60*60*24*7,'/');
+}
+else {
+  setcookie('cart',json_encode(array($_GET['id_product'])),time() + 60*60*24*7,'/');
+}
+if(isset($_GET['cate'])) {
+  header('location: ./category.php');
+  die();
+}
+
+alert_bt('success','Added to your cart');
+   echo '<script>
+   setTimeout(() => {
+     location.href = "./single-product.php?id_product='. $_GET['id_product'] .'"
+   }, 1000);
+   </script>';
+}
+$is_vip =0;
+if(isset($_COOKIE['token_id'])) {
+  $username = (getCustomData('SELECT ctm_username FROM customers INNER JOIN token_customer ON token_username = ctm_username'))[0][0];
+  $is_vip = getCustomData('SELECT ctm_isvip FROM customers WHERE ctm_username = "'. $username .'"')[0][0];
+
+}
 if(isset($_GET['del_cmt']) && isset($_GET['id_product'])) {
     deleteData('comment','cmt_id',$_GET['del_cmt']);
     alert_bt('success','Delete Successfully');
@@ -12,7 +41,6 @@ if(isset($_GET['del_cmt']) && isset($_GET['id_product'])) {
     </script>';
 }
 if(isset($_POST['content'])&& !empty($_POST['content']) && isset($_POST['star'])) {
-
   insertData('comment',substr(md5(($_POST['content'])),0,rand(0,strlen($_POST['content']))),getCustomData('SELECT token_username FROM token_customer WHERE token_content = "'. $_COOKIE['token_id'] .'" ')[0][0],$_GET['id_product'],$_POST['content'],$_POST['star']);
   header('location: ./single-product.php?id_product='. $_GET['id_product']);
 }
@@ -113,7 +141,19 @@ else {
           <div class="col-lg-5 offset-lg-1">
             <div class="s_product_text">
               <h4 class="text-uppercase"><?= $data[1] ?></h4>
-              <h2>$<?= $data[4] ?></h2>
+              <h2>$<?= $is_vip ?  $data[4]  -  ($data[4]/100)*7  : $data[4] ?>
+              <?php
+              if($is_vip) {
+                echo '<del class="ml-4">$'. $data[4] .'</del>
+                <a class="icon_btn float-right">
+                    <i class="lnr lnr lnr-diamond"></i>
+                    
+                  </a>
+                ';
+              }
+              
+              ?>
+                </h2>
               <ul class="list">
                 <li>
                   <a class="active" href="#">
@@ -163,12 +203,10 @@ else {
               <div class="card_area">
                 <?php
                 if(isset($_COOKIE['token_id'])) {
-                  echo ' <a class="main_btn" href="#">Add to Cart</a>
-                  <a class="icon_btn" href="#">
-                    <i class="lnr lnr lnr-diamond"></i>
-                  </a>
-                  <a class="icon_btn" href="#">
-                    <i class="lnr lnr lnr-heart"></i>
+                  echo ' <a class="main_btn" href="./checkout.php">Buy now</a>
+                  
+                  <a class="icon_btn" href="./single-product.php?id_product='. $_GET['id_product'] .'&cart=1">
+                  <i class="ti-shopping-cart"></i> 
                   </a>';
                 }
                 ?>
@@ -516,17 +554,20 @@ else {
                 for ($i=0; $i < count($comment_data); $i++) { 
                   $star_cmt = '';
                   $name_id = array(array('',''));
+                  $vip_data = '';
                   if(isset($_COOKIE['token_id'] )) {
                   $username_token = getCustomData('SELECT token_username FROM token_customer WHERE token_content = "'. $_COOKIE['token_id'] .'"')[0][0];
-                    $name_id = getCustomData('SELECT ctm_username,ctm_name FROM customers WHERE ctm_username = "'.  $username_token .'"');
+                    $name_id = getCustomData('SELECT ctm_username,ctm_name,ctm_isvip FROM customers WHERE ctm_username = "'.  $username_token .'"');
+                    $vip_data = getCustomData('SELECT ctm_isvip FROM customers WHERE ctm_username = "'. $comment_data[$i][1] . '"')[0][0];
                   }
+                  
                   for ($j=0; $j < $comment_data[$i][4] ; $j++) { 
 $star_cmt.='<i class="fa fa-star"></i>';
                   }
                   echo '  <div class="review_item">
                   <div class="media">
                     <div class="d-flex">
-                      <p class="text-white rounded-circle bg-secondary p-3" style="font-weight:bold">'. $comment_data[$i][1]  .'</p>  
+                      <p class="text-white rounded-circle p-3 '.  ($vip_data ? ' bg-warning' : ' bg-secondary') .'" style="font-weight:bold">'. $comment_data[$i][1]  .'</p>  
                     </div>
                     <div class="media-body">
                       <h4>'.  $name_id[0][1] . ($name_id[0][0] == $comment_data[$i][1] ? '<button class="btn" onclick="delete_cmt(`'. $comment_data[$i][0] .'`)" style="transform:scale(0.7)">X</button>' : '')   .' </h4>

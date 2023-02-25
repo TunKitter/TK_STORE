@@ -69,8 +69,9 @@
                   </li>
 
                   <li class="nav-item">
-                    <a href="./cart.php" class="icons">
+                    <a href="./customer_cart.php" class="icons">
                       <i class="ti-shopping-cart"></i>
+                      <sup><?= count(json_decode($_COOKIE['cart'])) ?></sup>
                     </a>
                   </li>
 
