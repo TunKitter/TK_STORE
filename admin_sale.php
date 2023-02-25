@@ -14,32 +14,26 @@ else if(isset($_SESSION['success_insert'])) {
 	$new_customer= getCustomData('SELECT * FROM category_product WHERE cate_id = "'. $_SESSION['success_insert'] .'"');
  }
  
-else if(isset($_SESSION['success_edit'])) {
-	echo '<div id="al_sc" class="alert alert-success">The customer: <strong>'. $_SESSION['success_edit'] .'</strong> has been edited </div>';
- }
+if(isset($_POST['product'])){
 
-if(isset($_POST['name'])){
-    $product_id = date('S').substr($_POST['name'],0,rand(0,strlen($_POST['name']))-1) ;
-    insertData('category_product', $product_id,$_POST['name']);
+    insertData('sale_off',substr(md5(time()+rand(0,1999)),0,5),$_POST['product'],$_POST['discount'],(isset($_POST['isvip']))? ($_POST['isvip'] == 'on' ? 1 : 0) : 0);
 	$_SESSION['success_insert'] = $product_id;
 	header_page();
 }
-else if(isset($_POST['name_edit']))
- {
-	  editData('category_product','cate_name',$_POST['name_edit'],'cate_id',$_POST['id_edit']);
-	$_SESSION['success_edit'] = $_POST['id_edit'];
-	header_page();
-	die();
- }
 if(isset($_GET['del']))
  {
 		for ($i=0; $i < count(explode(';',$_GET['del'])); $i++) { 
-			deleteData('category_product','cate_id',explode(';',$_GET['del'])[$i]);
+			deleteData('sale_off','sale_id',explode(';',$_GET['del'])[$i]);
 		}
 		$_SESSION['success_del'] = '1';
 		header_page();
  }
 
+ if(isset($_GET['vip']))
+  {
+	editData('sale_off','sale_vip',(getCustomData('SELECT sale_vip FROM sale_off WHERE sale_id = "'. $_GET['vip'] .'"')[0][0]) == 1 ? 0 : 1,'sale_id',$_GET['vip']);
+	header_page();
+  }
 
 ?>
 <style>
@@ -55,9 +49,24 @@ if(isset($_GET['del']))
       </div>
       <div class="modal-body">
       		<form method="post" id="create_customer">
-				  <div>
-					  <label>Product name</label>
-					  <input type='text' name='name'  placeholder="Enter your product name" class="form-control" />
+			  <div>
+					  <label>Apply for</label>
+					  <select class="form-select" name="product">
+						<?php
+						$prod = getCustomData('SELECT prod_name,prod_id FROM products');
+						for ($i=0; $i < count($prod); $i++) { 
+							echo '<option value="'. $prod[$i][1] .'">'. $prod[$i][0] .'</option>';
+						}
+						?>
+					  </select>
+					</div>
+                    <div>
+					  <label>Discount</label>
+					  <input type='text' name='discount'  placeholder="Enter your name product" class="form-control" />
+					</div>
+                    <div>
+					  <label class="form-check-label">Vip user</label>
+					  <input type='checkbox' name='isvip' class="form-checkbox-inline ml-4 mt-4" />
 					</div>
 				</form>
       </div>
@@ -68,34 +77,7 @@ if(isset($_GET['del']))
     </div>
   </div>
 </div>
-<div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">More info customer</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-      		<form method="post" id="edit_customer" onsubmit="return save_edit()">
-				  <div>
-					  <label>ID</label>
-					  <input type='text' readonly name='id_edit'  placeholder="Enter your name product" class="form-control" />
-					</div>
-                    <div>
-					  <label>Product name</label>
-					  <input type='text' name='name_edit'  placeholder="Enter your name product" class="form-control" />
-					</div>
-				</form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" form="edit_customer" class="btn btn-success">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
+
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
 </html>
@@ -106,9 +88,9 @@ if(isset($_GET['del']))
 						<div class="table-head">
 							<div class="serial flex-grow-1">#</div>
 							<div class="serial flex-grow-1">id</div>
-							<div class="serial flex-grow-1">Name</div>
-							<div class="serial flex-grow-1">Quantity</div>
-							<div class="serial flex-grow-1">More</div>
+							<div class="serial flex-grow-1">Apply for</div>
+							<div class="serial flex-grow-1">Discount</div>
+							<div class="serial flex-grow-1">For Vip User</div>
 						</div>
 	<?php
 	$index_col = isset($_GET['index_col']) ? $_GET['index_col'] : 0;
@@ -126,23 +108,26 @@ if(isset($_GET['del']))
 				<div class="serial flex-grow-1  d-flex flex-row-reverse justify-content-end align-items-center "><label for="chk"  >New</label><input class="d-none" type="checkbox" id="chk"  class="form-check" /></div>
 				<div class="serial flex-grow-1 name">'. $new_customer[0][0] .'</div>
 				<div class="serial flex-grow-1 name">'. $new_customer[0][1] .'</div>
-				<div class="serial flex-grow-1  username"></div>
-				<div class="serial flex-grow-1  username"></div>
 			</div>';
 	unset($_SESSION['success_insert']);
 			}
 	
 	else {
-		$data = getCustomData('SELECT * FROM category_product LIMIT ' . $index_col . ',' . $index_col+11);
+		$data = getCustomData('SELECT * FROM sale_off LIMIT ' . $index_col . ',' . $index_col+11);
 	}
 		if(!empty($data)) {
 			for($i = 0 ; $i < count($data) ; $i++) {
 				echo '	<div class="table-row">
 				<div class="serial flex-grow-1 d-flex flex-row-reverse justify-content-end align-items-center "><label for="chk_'. $i .'"  >'. $i .'</label><input class="d-none" type="checkbox" id="chk_'. $i .'"  class="form-check" /></div>
-				<div class="serial flex-grow-1 name">'.$data[$i][0].'</div>
-				<div class="serial flex-grow-1 username">'. $data[$i][1].'</div>
-				<div class="serial flex-grow-1 username">1000</div>
-				<div class="serial flex-grow-1"><a href="#"><span class="lnr lnr-arrow-right float-right" data-toggle="modal" data-target="#edit" onclick="edit_customer('. $i .')"></span></a></div>
+				<div class="serial flex-grow-1 vip name">'.$data[$i][0].'</div>
+				<div class="serial flex-grow-1 username"><img width="100px" src="./img/product/__0'. $data[$i][1] . '.'.json_decode(base64_decode(getCustomData('SELECT prod_image FROM products WHERE prod_id  = "'. $data[$i][1] .'"')[0][0]))[0]. '" />'.'</div>
+				<div class="serial flex-grow-1 username">'. $data[$i][2].'</div>
+				<div class="serial flex-grow-1 username">
+				<div class="primary-radio">
+						<input type="checkbox" id="primary-radio'. $i .'" '. ($data[$i][3] == '0' ? '' : 'checked')  .'>
+						<label for="primary-radio'. $i .'" onclick="change_vip('. $i .')"></label>
+					</div>
+				</div>
 
 			</div>';
 			}
@@ -197,7 +182,7 @@ if(isset($_GET['del']))
 
 	}
 	if(confirm('Are you sure to continue delete?')) {
-		location.href = 'admin_category.php?del='+text.substring(0,text.length-1)
+		location.href = 'admin_sale.php?del='+text.substring(0,text.length-1)
 	}
 	}					
 	var fields = ['name','username','password','email','phone']
@@ -214,5 +199,13 @@ if(isset($_GET['del']))
 		else {
 			return false
 		}
+	   }
+	   function change_vip(index) {
+		   let obj_vip = (document.getElementsByClassName('vip')[index].innerHTML)
+		 if(confirm('Are you sure to toggle '+ obj_vip + ' vip state? '))
+		  {
+			location.href = 'admin_sale.php?vip='+obj_vip;
+		  }
+			
 	   }
 				</script>

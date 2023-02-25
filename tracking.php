@@ -1,5 +1,9 @@
+
 <?php
+ob_start();
 include_once('./header.php');
+$username = getCustomData('SELECT ctm_username FROM customers INNER JOIN token_customer ON ctm_username = token_username')[0][0];
+$data_deli = getCustomData('SELECT * FROM delivery WHERE deli_customer = "' . $username .'"');
 ?>
     <!--================Home Banner Area =================-->
     <section class="banner_area">
@@ -9,12 +13,12 @@ include_once('./header.php');
             class="banner_content d-md-flex justify-content-between align-items-center"
           >
             <div class="mb-3 mb-md-0">
-              <h2>Order Tracking</h2>
+              <h2>Delivery</h2>
               <p>Very us move be blessed multiply night</p>
             </div>
             <div class="page_link">
               <a href="index.html">Home</a>
-              <a href="tracking.html">Order Tracking</a>
+              <a href="cart.html">Cart</a>
             </div>
           </div>
         </div>
@@ -22,26 +26,67 @@ include_once('./header.php');
     </section>
     <!--================End Home Banner Area =================-->
 
-    <!--================Tracking Box Area =================-->
-    <section class="tracking_box_area section_gap">
-        <div class="container">
-            <div class="tracking_box_inner">
-                <p>To track your order please enter your Order ID in the box below and press the "Track" button. This was given
-                    to you on your receipt and in the confirmation email you should have received.</p>
-                <form class="row tracking_form" action="#" method="post" novalidate="novalidate">
-                    <div class="col-md-12 form-group">
-                        <input type="text" class="form-control" id="order" name="order" placeholder="Order ID">
+    <!--================Cart Area =================-->
+    <section class="cart_area">
+      <div class="container-fluid">
+        <div class="cart_inner">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                        
+                        <?php
+                        for($i = 0 ;$i < count($data_deli); $i++) {
+                          $data = getCustomData('SELECT * FROM products WHERE prod_id  = "'. $data_deli[$i][1] .'"');
+                            echo '<tr>
+                            <td>  
+                              <div class="media">
+                                <div class="d-flex">
+                                  <img width="100px"
+                                    src="img/product/__0'. $data[0][0]. '.' . json_decode(base64_decode($data[0][3]))[0] . '"
+                                    alt=""
+                                  />
+                                </div>
+                                <div class="media-body">
+                                  <p>'. $data[0][1] .'</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <h5>$<span class="price">'. $data_deli[$i][4] .'</span></h5>
+                            </td>
+                            <td>'. $data_deli[$i][5] .'</td>
+                          </tr>';
+                          
+                        }
+                        ?>
                     </div>
-                    <div class="col-md-12 form-group">
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Billing Email Address">
-                    </div>
-                    <div class="col-md-12 form-group">
-                        <button type="submit" value="submit" class="btn submit_btn">Track Order</button>
-                    </div>
-                </form>
-            </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </section>
+  <script>
+    var price = document.getElementsByClassName('price')
+    var total_price = 0
+    for (let i = 0; i < price.length; i++) {
+      total_price+= parseInt(price[i].innerHTML)
+      
+    }
+    document.getElementById('total').innerHTML  = total_price
+  function del(index) {
+    location.href = '<?= $_SERVER['PHP_SELF'] ?>?del='+index
+  }
+  </script>
 <?php
-include_once('footer.php');
+include_once('./footer.php');
 ?>

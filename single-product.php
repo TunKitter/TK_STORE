@@ -57,6 +57,34 @@ else {
   $data = array('','','','','','','','');
 
 }
+
+$sale_price = (getCustomData('SELECT sale_discount,sale_vip FROM sale_off WHERE sale_apply = "'. $data[0] .'"')) ;
+if(!count($sale_price)) {
+  $sale_price = $data[4];
+}
+else {
+  $is_vip = (getCustomData('SELECT ctm_isvip FROM customers INNER JOIN token_customer ON ctm_username = token_username')[0][0]);
+  $sale_vip = $sale_price[0][1];
+  $sale_price =  $sale_price[0][0];
+  if(str_contains($sale_price,'k') ) {
+    if(($sale_vip == 1 && $is_vip ==1) || ($sale_vip == 0)) {
+      $sale_price = (int)($data[4]) - (int) rtrim($sale_price,'k') . '<sup>-'. $sale_price .'</sup>';
+    }
+    
+  }
+  else if(str_contains($sale_price,'%')) {
+    if(($sale_vip == 1 && $is_vip ==1) || ($sale_vip == 0)) {
+    $sale_price =(int) $data[4] - (int)(($data[4]/100)* rtrim($sale_price,'%')) . '<sup>-'. $sale_price .'</sup>' ;
+  }
+  else {
+
+    $sale_price = $data[4];
+  }
+}
+else {
+  $sale_price = $data[4];
+}
+} 
 ?>
     <!--================Home Banner Area =================-->
     <section class="banner_area">
@@ -141,7 +169,7 @@ else {
           <div class="col-lg-5 offset-lg-1">
             <div class="s_product_text">
               <h4 class="text-uppercase"><?= $data[1] ?></h4>
-              <h2>$<?= $is_vip ?  $data[4]  -  ($data[4]/100)*7  : $data[4] ?>
+              <h2>$<?= $sale_price ?>
               <?php
               if($is_vip) {
                 echo '<del class="ml-4">$'. $data[4] .'</del>
@@ -203,7 +231,7 @@ else {
               <div class="card_area">
                 <?php
                 if(isset($_COOKIE['token_id'])) {
-                  echo ' <a class="main_btn" href="./checkout.php">Buy now</a>
+                  echo ' <p class="main_btn" onclick="buy()">Buy now</p>
                   
                   <a class="icon_btn" href="./single-product.php?id_product='. $_GET['id_product'] .'&cart=1">
                   <i class="ti-shopping-cart"></i> 
@@ -657,6 +685,9 @@ $star_cmt.='<i class="fa fa-star"></i>';
       </div>
     </section>
     <script>
+      function buy() {
+        location.href = 'checkout.php?qty='+ (document.getElementsByName('qty')[0].value) + '&id_product=<?= $_GET['id_product']?>&sale_price=<?=$sale_price?>'
+      }
  let rate_star_average = (document.getElementsByClassName('rate'))
  let average_rate_total = 0
  lv_rate = 5;

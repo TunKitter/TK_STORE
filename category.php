@@ -63,6 +63,33 @@ include_once('./execute/pdo.php');
                 
                 // var_dump(dec_product($data[0][0]));
                 for ($i=0; $i < count($data); $i++) { 
+                  $sale_price = (getCustomData('SELECT sale_discount,sale_vip FROM sale_off WHERE sale_apply = "'. $data[$i][0] .'"')) ;
+                  if(!count($sale_price)) {
+                    $sale_price = $data[$i][4];
+                  }
+                  else {
+                    $is_vip = (getCustomData('SELECT ctm_isvip FROM customers INNER JOIN token_customer ON ctm_username = token_username')[0][0]);
+                    $sale_vip = $sale_price[0][1];
+                    $sale_price =  $sale_price[0][0];
+                    if(str_contains($sale_price,'k') ) {
+                      if(($sale_vip == 1 && $is_vip ==1) || ($sale_vip == 0)) {
+                        $sale_price = (int)($data[$i][4]) - (int) rtrim($sale_price,'k') . '<sup>-'. $sale_price .'</sup>';
+                      }
+                      
+                    }
+                    else if(str_contains($sale_price,'%')) {
+                      if(($sale_vip == 1 && $is_vip ==1) || ($sale_vip == 0)) {
+                      $sale_price =(int) $data[$i][4] - (int)(($data[$i][4]/100)* rtrim($sale_price,'%')) . '<sup>-'. $sale_price .'</sup>' ;
+                    }
+                    else {
+
+                      $sale_price = $data[$i][4];
+                    }
+                  }
+                  else {
+                    $sale_price = $data[$i][4];
+                  }
+                  } 
                 echo '<div class="col-lg-4 col-md-6 '. $data[$i][2] .'" brand="'.dec_product($data[$i][0])[2].'" color="'.dec_product($data[$i][0])[1].'">
                   <div class="single-product">
                     <div class="product-img">
@@ -84,7 +111,7 @@ include_once('./execute/pdo.php');
                         <h4>'. $data[$i][1] .'</h4>
                       </a>
                       <div class="mt-3">
-                        <span class="mr-4">$'. $data[$i][4] .'</span>
+                        <span class="mr-4">$'.  $sale_price .'</span>
                         <del>$'. $data[$i][4] .'</del>
                       </div>
                     </div>
@@ -98,7 +125,7 @@ include_once('./execute/pdo.php');
                 ?>
                 <div class="container" id="pagi">
                   <a href="category.php?index_col=<?=isset($_GET['index_col']) ? $_GET['index_col']+6:6?>" class="genric-btn btn-info float-right mr-4" style="border-radius: 15px;">Next <span class="lnr ml-2 lnr-arrow-right"></span></a>
-                  <a href="admin_customer.php?index_col=<?=isset($_GET['index_col']) && $_GET['index_col'] >=11 ? $_GET['index_col']-6: 0 ?>" class="genric-btn btn-info float-right mr-4" style="border-radius: 15px;"><span class="lnr mr-2 lnr-arrow-left"></span> Previous</a>
+                  <a href="category.php?index_col=<?=isset($_GET['index_col']) && $_GET['index_col'] >=11 ? $_GET['index_col']-6: 0 ?>" class="genric-btn btn-info float-right mr-4" style="border-radius: 15px;"><span class="lnr mr-2 lnr-arrow-left"></span> Previous</a>
                 </div>
                 <?php
                 if(!$data) {

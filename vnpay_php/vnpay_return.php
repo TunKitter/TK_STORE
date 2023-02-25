@@ -1,3 +1,6 @@
+<?php
+include_once('../execute/pdo.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -9,10 +12,10 @@
         <meta name="author" content="">
         <title>VNPAY RESPONSE</title>
         <!-- Bootstrap core CSS -->
-        <link href="/vnpay_php/assets/bootstrap.min.css" rel="stylesheet"/>
+        <link href="./assets/bootstrap.min.css" rel="stylesheet"/>
         <!-- Custom styles for this template -->
-        <link href="/vnpay_php/assets/jumbotron-narrow.css" rel="stylesheet">         
-        <script src="/vnpay_php/assets/jquery-1.11.3.min.js"></script>
+        <link href="./assets/jumbotron-narrow.css" rel="stylesheet">         
+        <script src="./assets/jquery-1.11.3.min.js"></script>
     </head>
     <body>
         <?php
@@ -84,7 +87,14 @@
                         if ($secureHash == $vnp_SecureHash) {
                             if ($_GET['vnp_ResponseCode'] == '00') {
                                 echo "<span style='color:blue'>GD Thanh cong</span>";
-                                echo '<script>alert(999)</script>';
+                                // echo '<script>alert(999)</script>';
+                                insertData('delivery',time()+rand(1,10000),explode('_',$_GET['vnp_OrderInfo'])[0],explode('_',$_GET['vnp_OrderInfo'])[1],explode('_',$_GET['vnp_OrderInfo'])[2],$_GET['vnp_Amount'] ,'Purchased');
+                                echo '<script>
+                                setTimeout(() => {
+                                  location.href = "../index.php"
+                                }, 1000);
+                                </script>';
+                              
 
                             } else {
                                 echo "<span style='color:red'>GD Khong thanh cong</span>";

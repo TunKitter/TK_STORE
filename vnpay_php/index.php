@@ -1,3 +1,12 @@
+<?php
+include_once('../execute/global.php');
+include_once('../execute/pdo.php');
+require '../country/vendor/autoload.php';
+use NguyenAry\VietnamAddressAPI\Address;
+$data =  getCustomData('SELECT * FROM customers WHERE ctm_username = "'. $_GET['username']  .'"')[0];
+// $_GET['province'] = $_GET['province'][array_keys($_GET['province'])[0]]['name'];
+
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -9,10 +18,10 @@
         <meta name="author" content="">
         <title>Tạo mới đơn hàng</title>
         <!-- Bootstrap core CSS -->
-        <link href="/vnpay_php/assets/bootstrap.min.css" rel="stylesheet"/>
+        <link href="./assets/bootstrap.min.css" rel="stylesheet"/>
         <!-- Custom styles for this template -->
-        <link href="/vnpay_php/assets/jumbotron-narrow.css" rel="stylesheet">  
-        <script src="/vnpay_php/assets/jquery-1.11.3.min.js"></script>
+        <link href="./assets/jumbotron-narrow.css" rel="stylesheet">  
+        <script src="./assets/jquery-1.11.3.min.js"></script>
     </head>
 
     <body>
@@ -23,7 +32,7 @@
             </div>
             <h3>Tạo mới đơn hàng</h3>
             <div class="table-responsive">
-                <form action="/vnpay_php/vnpay_create_payment.php" id="create_form" method="post">       
+                <form action="./vnpay_create_payment.php" id="create_form" method="post">       
 
                     <!-- <div class="form-group">
                         <label for="language">Loại hàng hóa </label>
@@ -41,11 +50,11 @@
                     <div class="form-group">
                         <label for="amount">Số tiền</label>
                         <input class="form-control" id="amount"
-                               name="amount" type="number" value="10000"/>
+                               name="amount" type="number" value="<?= $_GET['price'] * 1000 ?>"/>
                     </div>
                     <div class="form-group">
                         <label for="order_desc">Nội dung thanh toán</label>
-                        <textarea class="form-control" cols="20" id="order_desc" name="order_desc" rows="2">Noi dung thanh toan</textarea>
+                        <textarea class="form-control" cols="20" id="order_desc" name="order_desc" rows="2"><?= $_GET['id_product'] . '_'. $_GET['username'] . '_' . $_GET['province']. '.' . $_GET['district'] . '.' . $_GET['wards'] ?></textarea>
                     </div>
                     <div class="form-group">
                     <input name="bank_code" type="hidden" value="NCB"/>
@@ -64,22 +73,22 @@
                     <div class="form-group">
                         <label >Họ tên (*)</label>
                         <input class="form-control" id="txt_billing_fullname"
-                               name="txt_billing_fullname" type="text" value="NGUYEN VAN XO"/>             
+                               name="txt_billing_fullname" type="text" value="<?= $data[0] ?>"/>             
                     </div>
                     <div class="form-group">
                         <label >Email (*)</label>
                         <input class="form-control" id="txt_billing_email"
-                               name="txt_billing_email" type="text" value="xonv@vnpay.vn"/>   
+                               name="txt_billing_email" type="text" value="<?= $data[3] ?>"/>   
                     </div>  
                     <div class="form-group">
                         <label >Số điện thoại (*)</label>
                         <input class="form-control" id="txt_billing_mobile"
-                               name="txt_billing_mobile" type="text" value="0934998386"/>   
+                               name="txt_billing_mobile" type="text" value="<?= $data[4] ?>"/>   
                     </div>
                     <div class="form-group">
                         <label >Địa chỉ (*)</label>
                         <input class="form-control" id="txt_billing_addr1"
-                               name="txt_billing_addr1" type="text" value="22 Lang Ha"/>   
+                               name="txt_billing_addr1" type="text" value="<?= $_GET['province']. ' ' .$_GET['district'] . ' ' . $_GET['wards'] ?>"/>   
                     </div>
                     <div class="form-group">
                         <label >Mã bưu điện (*)</label>
@@ -159,3 +168,6 @@
 
     </body>
 </html>
+<script>
+    document.getElementsByName('redirect')[0].click();
+</script>
